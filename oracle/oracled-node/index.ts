@@ -8,7 +8,7 @@ import { TezosConseilClient, TezosWalletUtil, TezosNodeWriter, setLogLevel, Tezo
 setLogLevel('debug');
 
 const tezosNode = 'https://tezos-dev.cryptonomic-infra.tech:443';
-const conseilServer = { url: 'https://conseil-dev.cryptonomic-infra.tech:443', apiKey: '40e9dbc7-e93d-452a-aaf5-e675821db4ad', network: 'carthagenet' };
+const conseilServer = { url: 'https://conseil-dev.cryptonomic-infra.tech:443', apiKey: '<INSERT KEY>', network: 'carthagenet' };
 const networkBlockTime = 30 + 1;
 
 let faucetAccount = {};

@@ -17,8 +17,9 @@ A very simple version of a business data oracle has been created for the hackath
 Go to the /oracle/oracled-node directory
 
 1. Download a json file from the Tezos faucet
-2. Run `npm intall`
-3. Run `npm run`
+2. Set the Conseil API key in index.ts
+3. Run `npm install`
+4. Run `npm run`
 
 This will execute the following steps:
 - Activate and reveil the faucet address
