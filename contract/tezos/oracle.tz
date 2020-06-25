@@ -1,0 +1,239 @@
+parameter (or (or (pair %answerQuery (string %companyName) (nat %id)) (pair %makeQuery (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (or (address %updateAdmin) (set %updateOperatorList address)));
+storage   (pair (pair (address %admin) (set %operators address)) (pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex))));
+code
+  {
+    DUP;        # pair @parameter @storage : pair @parameter @storage
+    CDR;        # @storage : pair @parameter @storage
+    SWAP;       # pair @parameter @storage : @storage
+    CAR;        # @parameter : @storage
+    IF_LEFT
+      {
+        IF_LEFT
+          {
+            # Entry point: answerQuery # @parameter%answerQuery : @storage
+            # sp.verify(self.data.operators.contains(sp.sender), message = 'Privileged operation') # @parameter%answerQuery : @storage
+            SWAP;       # @storage : @parameter%answerQuery
+            DUP;        # @storage : @storage : @parameter%answerQuery
+            DUG 2;      # @storage : @parameter%answerQuery : @storage
+            CADR;       # set address : @parameter%answerQuery : @storage
+            SENDER;     # address : set address : @parameter%answerQuery : @storage
+            MEM;        # bool : @parameter%answerQuery : @storage
+            IF
+              {}
+              {
+                PUSH string "Privileged operation"; # string : @parameter%answerQuery : @storage
+                FAILWITH;   # FAILED
+              }; # @parameter%answerQuery : @storage
+            # sp.verify(self.data.queries.contains(params.id), message = 'Query doesn't exist') # @parameter%answerQuery : @storage
+            SWAP;       # @storage : @parameter%answerQuery
+            DUP;        # @storage : @storage : @parameter%answerQuery
+            DUG 2;      # @storage : @parameter%answerQuery : @storage
+            CDDAR;      # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : @parameter%answerQuery : @storage
+            SWAP;       # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : @storage
+            DUP;        # @parameter%answerQuery : @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : @storage
+            DUG 2;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : @parameter%answerQuery : @storage
+            CDR;        # nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : @parameter%answerQuery : @storage
+            MEM;        # bool : @parameter%answerQuery : @storage
+            IF
+              {}
+              {
+                PUSH string "Query doesn't exist"; # string : @parameter%answerQuery : @storage
+                FAILWITH;   # FAILED
+              }; # @parameter%answerQuery : @storage
+            # sp.transfer(sp.record(companyName = params.companyName, companyNumber = self.data.queries[params.id].companyNumber, jurisdiction = self.data.queries[params.id].jurisdiction), sp.tez(0), sp.contract(sp.TRecord(companyName = sp.TString, companyNumber = sp.TString, jurisdiction = sp.TString).layout(("companyName", ("companyNumber", "jurisdiction"))), self.data.queries[params.id].callback.address, entry_point='receiveAnswer').open_some()) # @parameter%answerQuery : @storage
+            NIL operation; # list operation : @parameter%answerQuery : @storage
+            DIG 2;      # @storage : list operation : @parameter%answerQuery
+            DUP;        # @storage : @storage : list operation : @parameter%answerQuery
+            DUG 3;      # @storage : list operation : @parameter%answerQuery : @storage
+            CDDAR;      # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : list operation : @parameter%answerQuery : @storage
+            DIG 2;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : list operation : @storage
+            DUP;        # @parameter%answerQuery : @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : list operation : @storage
+            DUG 3;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : list operation : @parameter%answerQuery : @storage
+            CDR;        # nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : list operation : @parameter%answerQuery : @storage
+            GET;        # option (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : list operation : @parameter%answerQuery : @storage
+            IF_SOME
+              {
+                # of_some: Get-item:48 # @some : list operation : @parameter%answerQuery : @storage
+              }
+              {
+                PUSH string "Get-item:48"; # string : list operation : @parameter%answerQuery : @storage
+                FAILWITH;   # FAILED
+              }; # @some : list operation : @parameter%answerQuery : @storage
+            CAAR;       # address : list operation : @parameter%answerQuery : @storage
+            CONTRACT %receiveAnswer (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction))); # option (contract (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) : list operation : @parameter%answerQuery : @storage
+            IF_SOME
+              {}
+              {
+                PUSH unit Unit; # unit : list operation : @parameter%answerQuery : @storage
+                FAILWITH;   # FAILED
+              }; # @some : list operation : @parameter%answerQuery : @storage
+            PUSH mutez 0; # mutez : @some : list operation : @parameter%answerQuery : @storage
+            DIG 4;      # @storage : mutez : @some : list operation : @parameter%answerQuery
+            DUP;        # @storage : @storage : mutez : @some : list operation : @parameter%answerQuery
+            DUG 5;      # @storage : mutez : @some : list operation : @parameter%answerQuery : @storage
+            CDDAR;      # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : mutez : @some : list operation : @parameter%answerQuery : @storage
+            DIG 4;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : mutez : @some : list operation : @storage
+            DUP;        # @parameter%answerQuery : @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : mutez : @some : list operation : @storage
+            DUG 5;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : mutez : @some : list operation : @parameter%answerQuery : @storage
+            CDR;        # nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : mutez : @some : list operation : @parameter%answerQuery : @storage
+            GET;        # option (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : mutez : @some : list operation : @parameter%answerQuery : @storage
+            IF_SOME
+              {
+                # of_some: Get-item:48 # @some : mutez : @some : list operation : @parameter%answerQuery : @storage
+              }
+              {
+                PUSH string "Get-item:48"; # string : mutez : @some : list operation : @parameter%answerQuery : @storage
+                FAILWITH;   # FAILED
+              }; # @some : mutez : @some : list operation : @parameter%answerQuery : @storage
+            CDDR;       # string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            DIG 5;      # @storage : string : mutez : @some : list operation : @parameter%answerQuery
+            DUP;        # @storage : @storage : string : mutez : @some : list operation : @parameter%answerQuery
+            DUG 6;      # @storage : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            CDDAR;      # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            DIG 5;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : string : mutez : @some : list operation : @storage
+            DUP;        # @parameter%answerQuery : @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : string : mutez : @some : list operation : @storage
+            DUG 6;      # @parameter%answerQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            CDR;        # nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            GET;        # option (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            IF_SOME
+              {
+                # of_some: Get-item:48 # @some : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+              }
+              {
+                PUSH string "Get-item:48"; # string : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+                FAILWITH;   # FAILED
+              }; # @some : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            CDAR;       # string : string : mutez : @some : list operation : @parameter%answerQuery : @storage
+            PAIR %companyNumber %jurisdiction; # pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @parameter%answerQuery : @storage
+            DIG 4;      # @parameter%answerQuery : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @storage
+            CAR;        # string : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @storage
+            PAIR %companyName; # pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)) : mutez : @some : list operation : @storage
+            TRANSFER_TOKENS; # operation : list operation : @storage
+            CONS;       # list operation : @storage
+          }
+          {
+            # Entry point: makeQuery # @parameter%makeQuery : @storage
+            # index = sp.local("index", self.data.queryIndex, sp.TNat) # @parameter%makeQuery : @storage
+            SWAP;       # @storage : @parameter%makeQuery
+            DUP;        # @storage : @storage : @parameter%makeQuery
+            DUG 2;      # @storage : @parameter%makeQuery : @storage
+            CDDDR;      # nat : @parameter%makeQuery : @storage
+            # self.data.queryIndex += 1 # nat : @parameter%makeQuery : @storage
+            DIG 2;      # @storage : nat : @parameter%makeQuery
+            DUP;        # @storage : @storage : nat : @parameter%makeQuery
+            DUG 3;      # @storage : nat : @parameter%makeQuery : @storage
+            DUP;        # @storage : @storage : nat : @parameter%makeQuery : @storage
+            CAR;        # pair (address %admin) (set %operators address) : @storage : nat : @parameter%makeQuery : @storage
+            SWAP;       # @storage : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            CDR;        # pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            DUP;        # pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            CAR;        # int : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            SWAP;       # pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            CDAR;       # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            PUSH nat 1; # nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery : @storage
+            DIG 6;      # @storage : nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CDDDR;      # nat : nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            ADD;        # nat : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            SWAP;       # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            PAIR;       # pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            SWAP;       # int : pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            PAIR;       # pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            SWAP;       # pair (address %admin) (set %operators address) : pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : nat : @parameter%makeQuery
+            PAIR;       # pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)) : nat : @parameter%makeQuery
+            DUG 2;      # nat : @parameter%makeQuery : pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat))
+            # self.data.queries[index.value] = sp.record(callback = params.callback, companyNumber = params.companyNumber, jurisdiction = params.jurisdiction) # nat : @parameter%makeQuery : pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat))
+            DIG 2;      # pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)) : nat : @parameter%makeQuery
+            DUP;        # pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)) : pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)) : nat : @parameter%makeQuery
+            CAR;        # pair (address %admin) (set %operators address) : pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)) : nat : @parameter%makeQuery
+            SWAP;       # pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CDR;        # pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            DUP;        # pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CAR;        # int : pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            SWAP;       # pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CDR;        # pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            DUP;        # pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CDR;        # nat : pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            SWAP;       # pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CAR;        # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            DIG 5;      # @parameter%makeQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            DUP;        # @parameter%makeQuery : @parameter%makeQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            DUG 6;      # @parameter%makeQuery : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CDDR;       # string : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            DIG 6;      # @parameter%makeQuery : string : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            DUP;        # @parameter%makeQuery : @parameter%makeQuery : string : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            DUG 7;      # @parameter%makeQuery : string : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            CDAR;       # string : string : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            PAIR %companyNumber %jurisdiction; # pair (string %companyNumber) (string %jurisdiction) : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat : @parameter%makeQuery
+            DIG 6;      # @parameter%makeQuery : pair (string %companyNumber) (string %jurisdiction) : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            CAR;        # pair (address %address) (string %entryPoint) : pair (string %companyNumber) (string %jurisdiction) : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            PAIR %callback; # pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)) : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            SOME;       # option (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address) : nat
+            DIG 5;      # nat : option (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address)
+            UPDATE;     # big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))) : nat : int : pair (address %admin) (set %operators address)
+            PAIR;       # pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : int : pair (address %admin) (set %operators address)
+            SWAP;       # int : pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat : pair (address %admin) (set %operators address)
+            PAIR;       # pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat) : pair (address %admin) (set %operators address)
+            SWAP;       # pair (address %admin) (set %operators address) : pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat)
+            PAIR;       # pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat))
+            NIL operation; # list operation : pair (pair (address %admin) (set %operators address)) (pair int (pair (big_map nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) nat))
+          }; # list operation : @storage
+      }
+      {
+        IF_LEFT
+          {
+            # Entry point: updateAdmin # @parameter%updateAdmin : @storage
+            # sp.verify(sp.sender == self.data.admin, message = 'Privileged operation') # @parameter%updateAdmin : @storage
+            SWAP;       # @storage : @parameter%updateAdmin
+            DUP;        # @storage : @storage : @parameter%updateAdmin
+            DUG 2;      # @storage : @parameter%updateAdmin : @storage
+            CAAR;       # address : @parameter%updateAdmin : @storage
+            SENDER;     # address : address : @parameter%updateAdmin : @storage
+            COMPARE;    # int : @parameter%updateAdmin : @storage
+            EQ;         # bool : @parameter%updateAdmin : @storage
+            IF
+              {}
+              {
+                PUSH string "Privileged operation"; # string : @parameter%updateAdmin : @storage
+                FAILWITH;   # FAILED
+              }; # @parameter%updateAdmin : @storage
+            # self.data.admin = params.admin # @parameter%updateAdmin : @storage
+            SWAP;       # @storage : @parameter%updateAdmin
+            DUP;        # @storage : @storage : @parameter%updateAdmin
+            CDR;        # pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : @storage : @parameter%updateAdmin
+            SWAP;       # @storage : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : @parameter%updateAdmin
+            CADR;       # set address : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : @parameter%updateAdmin
+            DIG 2;      # @parameter%updateAdmin : set address : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex))
+            PAIR;       # pair @parameter%updateAdmin (set address) : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex))
+            PAIR;       # pair (pair @parameter%updateAdmin (set address)) (pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)))
+          }
+          {
+            # Entry point: updateOperatorList # @parameter%updateOperatorList : @storage
+            # sp.verify(sp.sender == self.data.admin, message = 'Privileged operation') # @parameter%updateOperatorList : @storage
+            SWAP;       # @storage : @parameter%updateOperatorList
+            DUP;        # @storage : @storage : @parameter%updateOperatorList
+            DUG 2;      # @storage : @parameter%updateOperatorList : @storage
+            CAAR;       # address : @parameter%updateOperatorList : @storage
+            SENDER;     # address : address : @parameter%updateOperatorList : @storage
+            COMPARE;    # int : @parameter%updateOperatorList : @storage
+            EQ;         # bool : @parameter%updateOperatorList : @storage
+            IF
+              {}
+              {
+                PUSH string "Privileged operation"; # string : @parameter%updateOperatorList : @storage
+                FAILWITH;   # FAILED
+              }; # @parameter%updateOperatorList : @storage
+            # self.data.operators = params.operators # @parameter%updateOperatorList : @storage
+            SWAP;       # @storage : @parameter%updateOperatorList
+            DUP;        # @storage : @storage : @parameter%updateOperatorList
+            CDR;        # pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : @storage : @parameter%updateOperatorList
+            SWAP;       # @storage : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : @parameter%updateOperatorList
+            CAAR;       # address : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)) : @parameter%updateOperatorList
+            DIG 2;      # @parameter%updateOperatorList : address : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex))
+            SWAP;       # address : @parameter%updateOperatorList : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex))
+            PAIR;       # pair address @parameter%updateOperatorList : pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex))
+            PAIR;       # pair (pair address @parameter%updateOperatorList) (pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)))
+          }; # pair (pair @parameter%updateAdmin (set address)) (pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)))
+        NIL operation; # list operation : pair (pair @parameter%updateAdmin (set address)) (pair (int %oracleIndex) (pair (big_map %queries nat (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) (nat %queryIndex)))
+      }; # list operation : @storage
+    PAIR;       # pair (list operation) @storage
+  } # pair (list operation) @storage;

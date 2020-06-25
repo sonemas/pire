@@ -1,0 +1,67 @@
+parameter (or (pair %receiveAnswer (string %companyName) (pair (string %companyNumber) (string %jurisdiction))) (pair %sendQuery (string %companyNumber) (string %jurisdiction)));
+storage   (pair (option %answer (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) (address %oracle));
+code
+  {
+    DUP;        # pair @parameter @storage : pair @parameter @storage
+    CDR;        # @storage : pair @parameter @storage
+    SWAP;       # pair @parameter @storage : @storage
+    CAR;        # @parameter : @storage
+    IF_LEFT
+      {
+        # Entry point: receiveAnswer # @parameter%receiveAnswer : @storage
+        # self.data.answer = sp.some(sp.record(companyName = params.companyName, companyNumber = params.companyNumber, jurisdiction = params.jurisdiction)) # @parameter%receiveAnswer : @storage
+        SWAP;       # @storage : @parameter%receiveAnswer
+        CDR;        # address : @parameter%receiveAnswer
+        SWAP;       # @parameter%receiveAnswer : address
+        DUP;        # @parameter%receiveAnswer : @parameter%receiveAnswer : address
+        DUG 2;      # @parameter%receiveAnswer : address : @parameter%receiveAnswer
+        CDDR;       # string : address : @parameter%receiveAnswer
+        DIG 2;      # @parameter%receiveAnswer : string : address
+        DUP;        # @parameter%receiveAnswer : @parameter%receiveAnswer : string : address
+        DUG 3;      # @parameter%receiveAnswer : string : address : @parameter%receiveAnswer
+        CDAR;       # string : string : address : @parameter%receiveAnswer
+        PAIR %companyNumber %jurisdiction; # pair (string %companyNumber) (string %jurisdiction) : address : @parameter%receiveAnswer
+        DIG 2;      # @parameter%receiveAnswer : pair (string %companyNumber) (string %jurisdiction) : address
+        CAR;        # string : pair (string %companyNumber) (string %jurisdiction) : address
+        PAIR %companyName; # pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)) : address
+        SOME;       # option (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction))) : address
+        PAIR;       # pair (option (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) address
+        NIL operation; # list operation : pair (option (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) address
+      }
+      {
+        # Entry point: sendQuery # @parameter%sendQuery : @storage
+        # sp.transfer(sp.record(callback = sp.record(address = sp.to_address(sp.self), entryPoint = 'receiveAnswer'), companyNumber = params.companyNumber, jurisdiction = params.jurisdiction), sp.tez(0), sp.contract(sp.TRecord(callback = sp.TRecord(address = sp.TAddress, entryPoint = sp.TString).layout(("address", "entryPoint")), companyNumber = sp.TString, jurisdiction = sp.TString).layout(("callback", ("companyNumber", "jurisdiction"))), self.data.oracle, entry_point='makeQuery').open_some()) # @parameter%sendQuery : @storage
+        NIL operation; # list operation : @parameter%sendQuery : @storage
+        DIG 2;      # @storage : list operation : @parameter%sendQuery
+        DUP;        # @storage : @storage : list operation : @parameter%sendQuery
+        DUG 3;      # @storage : list operation : @parameter%sendQuery : @storage
+        CDR;        # address : list operation : @parameter%sendQuery : @storage
+        CONTRACT %makeQuery (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction))); # option (contract (pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)))) : list operation : @parameter%sendQuery : @storage
+        IF_SOME
+          {}
+          {
+            PUSH unit Unit; # unit : list operation : @parameter%sendQuery : @storage
+            FAILWITH;   # FAILED
+          }; # @some : list operation : @parameter%sendQuery : @storage
+        PUSH mutez 0; # mutez : @some : list operation : @parameter%sendQuery : @storage
+        DIG 3;      # @parameter%sendQuery : mutez : @some : list operation : @storage
+        DUP;        # @parameter%sendQuery : @parameter%sendQuery : mutez : @some : list operation : @storage
+        DUG 4;      # @parameter%sendQuery : mutez : @some : list operation : @parameter%sendQuery : @storage
+        CDR;        # string : mutez : @some : list operation : @parameter%sendQuery : @storage
+        DIG 4;      # @parameter%sendQuery : string : mutez : @some : list operation : @storage
+        DUP;        # @parameter%sendQuery : @parameter%sendQuery : string : mutez : @some : list operation : @storage
+        DUG 5;      # @parameter%sendQuery : string : mutez : @some : list operation : @parameter%sendQuery : @storage
+        CAR;        # string : string : mutez : @some : list operation : @parameter%sendQuery : @storage
+        PAIR %companyNumber %jurisdiction; # pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @parameter%sendQuery : @storage
+        PUSH string "receiveAnswer"; # string : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @parameter%sendQuery : @storage
+        SELF;       # contract (or (pair %receiveAnswer (string %companyName) (pair (string %companyNumber) (string %jurisdiction))) (pair %sendQuery (string %companyNumber) (string %jurisdiction))) : string : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @parameter%sendQuery : @storage
+        DIG 6;      # @parameter%sendQuery : contract (or (pair %receiveAnswer (string %companyName) (pair (string %companyNumber) (string %jurisdiction))) (pair %sendQuery (string %companyNumber) (string %jurisdiction))) : string : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @storage
+        DROP;       # contract (or (pair %receiveAnswer (string %companyName) (pair (string %companyNumber) (string %jurisdiction))) (pair %sendQuery (string %companyNumber) (string %jurisdiction))) : string : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @storage
+        ADDRESS;    # address : string : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @storage
+        PAIR %address %entryPoint; # pair (address %address) (string %entryPoint) : pair (string %companyNumber) (string %jurisdiction) : mutez : @some : list operation : @storage
+        PAIR %callback; # pair (pair %callback (address %address) (string %entryPoint)) (pair (string %companyNumber) (string %jurisdiction)) : mutez : @some : list operation : @storage
+        TRANSFER_TOKENS; # operation : list operation : @storage
+        CONS;       # list operation : @storage
+      }; # list operation : pair (option (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) address
+    PAIR;       # pair (list operation) (pair (option (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) address)
+  } # pair (list operation) (pair (option (pair (string %companyName) (pair (string %companyNumber) (string %jurisdiction)))) address);

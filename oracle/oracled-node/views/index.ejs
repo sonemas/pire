@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Business Oracle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+    <div class="container">
+        <h1 class="header">Business Oracle</h1>
+                
+        <div class="row">
+            <h3>Queries</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Jurisdiction</th>
+                        <th>Company number</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% queries.forEach( function(query) { %>
+                        <tr>
+                            <td><%= query.id %></td>
+                            <td><%= query.jurisdiction %></td>
+                            <td><%= query.companyNumber %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            
+            <div class="row">
+                <h4>Send query</h4>
+                <form class="col s12" action="/send_query" method="POST">
+                    <div class="row">
+                        <!-- <div class="input-field col s6">
+                            <input placeholder="Jurisdiction" id="jurisdiction" type="text" class="validate" name="jurisdiction" value="UK" disabled>
+                            <label for="jurisdiction">Jurisdiction</label>
+                        </div> -->
+                        <div class="input-field col s6">
+                            <!-- <label for="companyNumber">Company number</label> -->
+                            <input placeholder="Company number" id="companyNumber" type="text" class="validate" name="companyNumber">
+                        </div>
+                    </div>
+                    <button class="btn" type="submit" name="action"><i class="material-icons right">arrow_forward</i>Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

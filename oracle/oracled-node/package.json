@@ -1,0 +1,33 @@
+{
+    "name": "oracled-node",
+    "version": "0.0.1",
+    "description": "Sonemas oracled",
+    "main": "index.ts",
+    "scripts": {
+        "postinstall": "npm run build",
+        "build": "tsc index.ts",
+        "start": "node index.js"
+    },
+    "author": "Arjan van Eersel <arjan@sonemas.com>",
+    "license": "GPL-3.0",
+    "engines": {
+        "node": ">=12.16.1",
+        "npm": ">=6.13.4"
+    },
+    "homepage": "https://sonemas.com",
+    "dependencies": {
+        "@types/express": "^4.17.6",
+        "axios": "^0.19.2",
+        "bignumber.js": "^9.0.0",
+        "body-parser": "^1.19.0",
+        "conseiljs": "0.4.3-beta.1",
+        "dotenv": "^8.2.0",
+        "ejs": "^3.1.3",
+        "express": "^4.17.1",
+        "glob": "^7.1.6",
+        "request": "^2.88.2"
+    },
+    "devDependencies": {
+        "typescript": "3.8.3"
+    }
+}
